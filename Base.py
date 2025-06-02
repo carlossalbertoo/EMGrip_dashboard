@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
 import plotly.graph_objects as go
+import json
 from funciones import (
     filtro_pasabanda, clipping_intermedio, detectar_eventos,
     calcular_rms_por_evento, obtener_contracciones_alineadas,     calcular_duracion_contraccion,
@@ -20,10 +21,16 @@ lowcut = 0.2
 highcut = 4.5
 orden = 4
 
-# === Acceso a Google Sheets ===
+# === Acceso a Google Sheets desde secrets ===
 alcance = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-credenciales = ServiceAccountCredentials.from_json_keyfile_name("emgrip-085e0fe17013.json", alcance)
+
+# Convertir AttrDict a dict estándar de Python
+credenciales_dict = dict(st.secrets["gcp_service_account"])
+
+# Crear objeto de credenciales y autorizar
+credenciales = ServiceAccountCredentials.from_json_keyfile_dict(credenciales_dict, alcance)
 cliente = gspread.authorize(credenciales)
+
 nombre_documento = "EMG_data"
 
 # === Leer y filtrar datos de todos los días ===

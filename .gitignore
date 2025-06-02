@@ -1,2 +1,5 @@
 # Archivos sensibles
+__pycache__/
+*.pyc
 *.json
+.streamlit/
