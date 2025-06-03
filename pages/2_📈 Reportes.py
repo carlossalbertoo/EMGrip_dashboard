@@ -1,10 +1,14 @@
-# reportes.py
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-from Base import resultados_reclutamiento, graficar_dia_reclutamiento, velocimetro_isb
-# --- Importar funciones y variables necesarias ---
-from Base import datos_filtrados_rectificados, resultados_fatiga
+from Base import (
+    obtener_datos_filtrados_rectificados,
+    obtener_resultados_reclutamiento,
+    obtener_resultados_fatiga,
+    graficar_dia_reclutamiento,
+    graficar_dia_fatiga,
+    velocimetro_isb
+)
 from graficos import graficar_deteccion_contraccion, graficar_rms_bloques_con_pendiente
 import io
 import pandas as pd
@@ -41,10 +45,8 @@ st.markdown("---")
 # ----------- Navegación estilo calendario -----------
 st.subheader("📅 Selecciona periodo de análisis")
 
-# Fase 1: Selección de Año
 anio_seleccionado = st.selectbox("Año", ["2023", "2024", "2025"], index=2)
 
-# Fase 2: Selección de Mes (solo activa junio)
 if anio_seleccionado == "2025":
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", 
              "Septiembre", "Octubre", "Noviembre", "Diciembre"]
@@ -58,14 +60,17 @@ if anio_seleccionado == "2025":
             dias = ["Día 1", "Día 2", "Día 3", "Día 4", "Día 5", "Día 6", "Día 7", "Días 1–7"]
             dia_seleccionado = st.selectbox("Día", dias)
 
-            # Inicializar variable de sesión
             if "confirmado" not in st.session_state:
                 st.session_state.confirmado = False
 
-            # Botón de confirmación
             if not st.session_state.confirmado:
                 if st.button("✅ Confirmar"):
                     st.session_state.confirmado = True
+
+            if st.session_state.confirmado:
+                datos_filtrados_rectificados = obtener_datos_filtrados_rectificados()
+                resultados_reclutamiento = obtener_resultados_reclutamiento(datos_filtrados_rectificados)
+                resultados_fatiga = obtener_resultados_fatiga(datos_filtrados_rectificados)
 
             # Sección posterior a la confirmación
             if st.session_state.confirmado:
